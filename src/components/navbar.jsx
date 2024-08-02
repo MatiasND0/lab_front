@@ -1,4 +1,6 @@
-import React from 'react';
+import React, { useContext } from 'react';
+import { AuthContext } from './AuthContext';
+import { Link } from 'react-router-dom';
 
 import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
@@ -6,7 +8,9 @@ import Navbar from 'react-bootstrap/Navbar';
 import NavDropdown from 'react-bootstrap/NavDropdown';
 import logo from '../logo_unlam.svg'
 
+
 const MyNavbar = () => {
+    const { user, isAuthenticated } = useContext(AuthContext);
     return (
         <Navbar expand="lg" className="bg-body-tertiary">
             <Container>
@@ -21,6 +25,7 @@ const MyNavbar = () => {
                             <NavDropdown.Item href="/inventario">Proyector</NavDropdown.Item>
                             <NavDropdown.Item href="/">Instrumentos</NavDropdown.Item>
                         </NavDropdown>
+                        <Nav.Link href="/">{"user.username"}</Nav.Link>
                     </Nav>
                 </Navbar.Collapse>
             </Container>

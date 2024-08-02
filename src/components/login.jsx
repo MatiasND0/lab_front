@@ -1,14 +1,22 @@
-// src/Login.js
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import Card from 'react-bootstrap/Card';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 
+import { AuthContext } from './AuthContext';
+
 const Login = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-
+    const [error, setError] = useState('');
+    const [responseData, setResponseData] = useState(null);
+    
+    const authContext = useContext(AuthContext);
+    const login = authContext?.login;
+    const navigate = useNavigate();
+    
     const handleLogin = async (e) => {
         e.preventDefault();
         try {
@@ -19,9 +27,22 @@ const Login = () => {
                 },
                 body: JSON.stringify({ username, password }),
             });
+
             const data = await response.json();
-            console.log(data);
+
+            if (response.ok) {
+                login(data.user);
+                console.log('Inicio de sesión exitoso:', data);
+                setError('');
+                setResponseData(data);
+                
+                navigate('/');
+            } else {
+                setError('Usuario o contraseña incorrectos');
+                console.error('Error en el inicio de sesión:', data.message);
+            }
         } catch (error) {
+            setError('Error en el inicio de sesión');
             console.error('Error:', error);
         }
     };
@@ -29,6 +50,7 @@ const Login = () => {
     return (
         <Card style={{ width: '18rem' }}>
         <Card.Body>
+        <Card.Text>{error}</Card.Text>
         <Card.Text>
             <Form onSubmit={handleLogin}>
                 <Form.Group className="mb-3" controlId="formBasicEmail">
