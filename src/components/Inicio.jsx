@@ -1,11 +1,13 @@
-import React from 'react'
+import React from 'react';
 
-function Inicio() {
-    return(
-        <div>
-            <h1>Inicio</h1>
-        </div>
-    );
+import Login from './Login';
+
+function Inicio () {
+  return(
+    <div>
+      <Login/>
+    </div>
+  ); 
 };
 
 export default Inicio;
