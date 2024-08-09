@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Button, Table, Modal, Form, Tab, Tabs } from 'react-bootstrap';
+import { Container, Button, Table, Modal, Form } from 'react-bootstrap';
 
 const IP = 'localhost';
 
@@ -110,7 +110,7 @@ function TableData({ data, onDelete }) {
 }
 
 function FormProy({ onAdd, onClose }) {
-    const [formData, setFormData] = useState({ table: 'libros' });
+    const [formData, setFormData] = useState({ table: 'libros', idioma: 'en'});
     const [tipo, setTipo] = useState('libro');
 
     const handleChange = (event) => {
@@ -159,10 +159,6 @@ function FormProy({ onAdd, onClose }) {
     return (
         <Form style={{ margin: "5%" }} onSubmit={handleSubmit}>
             <Form.Group className="mb-3">
-                <Form.Label htmlFor="id">ID</Form.Label>
-                <Form.Control id="id" name="id" type="text" placeholder="ID" onChange={handleChange} />
-            </Form.Group>
-            <Form.Group className="mb-3">
                 <Form.Label htmlFor="titulo">Titulo</Form.Label>
                 <Form.Control id="titulo" name="titulo" type="text" placeholder="Titulo" onChange={handleChange} />
             </Form.Group>
@@ -173,8 +169,8 @@ function FormProy({ onAdd, onClose }) {
             <Form.Group className="mb-3">
                 <Form.Label htmlFor="idioma">Idioma</Form.Label>
                 <Form.Select id="idioma" name="idioma" onChange={handleChange}>
-                    <option value="eng">Ingles</option>
-                    <option value="esp">Español</option>
+                    <option value="en">Ingles</option>
+                    <option value="es">Español</option>
                     <option value="otro">Otro</option>
                 </Form.Select>
             </Form.Group>
@@ -187,10 +183,15 @@ function FormProy({ onAdd, onClose }) {
                 <Form.Control id="ubicacion" name="ubicacion" type="text" placeholder="Ubicacion" onChange={handleChange} />
             </Form.Group>
             <Form.Group className="mb-3">
+                <Form.Label htmlFor="cantidad">Cantidad</Form.Label>
+                <Form.Control id="cantidad" name="cantidad" type="number" placeholder="Cantidad" onChange={handleChange} />
+            </Form.Group>
+            <Form.Group className="mb-3">
                 <Form.Label htmlFor="tipo">Tipo</Form.Label>
                 <Form.Select id="tipo" name="tipo" onChange={handleChangeTipo} >
                     <option value="libro">Libro</option>
                     <option value="manual">Manual</option>
+                    <option value="databook">Databook</option>
                     <option value="otro">Otro</option>
                 </Form.Select>
             </Form.Group>
@@ -198,22 +199,35 @@ function FormProy({ onAdd, onClose }) {
             {tipo === 'libro' && (
                 <>
                     <Form.Group className="mb-3">
-                        <Form.Label htmlFor="author">Author</Form.Label>
-                        <Form.Control id="author" name="author" type="text" placeholder="Author" onChange={handleChange} />
+                        <Form.Label htmlFor="autor">Autor</Form.Label>
+                        <Form.Control id="autor" name="autor" type="text" placeholder="Autor" onChange={handleChange} />
                     </Form.Group>
                     <Form.Group className="mb-3">
-                        <Form.Label htmlFor="publisher">Publisher</Form.Label>
-                        <Form.Control id="publisher" name="publisher" type="text" placeholder="Publisher" onChange={handleChange} />
+                        <Form.Label htmlFor="editorial">Editorial</Form.Label>
+                        <Form.Control id="editorial" name="editorial" type="text" placeholder="Editorial" onChange={handleChange} />
                     </Form.Group>
                     <Form.Group className="mb-3">
-                        <Form.Label htmlFor="publication_date">Publication Date</Form.Label>
-                        <Form.Control id="publication_date" name="publication_date" type="date" onChange={handleChange} />
+                        <Form.Label htmlFor="year">Año</Form.Label>
+                        <Form.Control id="year" name="Año" type="number" min="1900" max="3000" placeholder="Año" onChange={handleChange} />
                     </Form.Group>
                 </>
             )}
 
             {tipo === 'manual' && (
                 <>
+                    <Form.Group className="mb-3">
+                        <Form.Label htmlFor="equipo">Equipo</Form.Label>
+                        <Form.Select id="equipo" name="equipo" onChange={handleChange} >
+                            <option value="C">Contador</option>
+                            <option value="F">Fuente</option>
+                            <option value="G">Generador de funciones</option>
+                            <option value="K">Kit</option>
+                            <option value="O">Osciloscopio</option>
+                            <option value="M">Multimetro</option>
+                            <option value="V">Varios</option>
+                            <option value="XX">Otros</option>
+                        </Form.Select>
+                    </Form.Group>
                     <Form.Group className="mb-3">
                         <Form.Label htmlFor="intrumento_asociado">Instrumento asociado</Form.Label>
                         <Form.Control id="intrumento_asociado" name="intrumento_asociado" type="text" placeholder="Instrumento asociado" onChange={handleChange} />
