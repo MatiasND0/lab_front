@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Button, Table, Modal, Form } from 'react-bootstrap';
+import { Container, Button, Table, Modal, Form, Tab, Tabs } from 'react-bootstrap';
 
 const IP = 'localhost';
 
@@ -39,7 +39,7 @@ function InventarioLibros() {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ table: 'libros' ,nro_inv: row.id }),
+                body: JSON.stringify({ table: 'libros', nro_inv: row.id }),
             });
 
             if (!response.ok) {
@@ -61,8 +61,8 @@ function InventarioLibros() {
     };
 
     return (
-        <Container fluid style={{margin:"5px"}}>
-            <Button variant="primary" onClick={handleShow} style={{margin:"5px"}}>
+        <Container fluid style={{ margin: "5px" }}>
+            <Button variant="primary" onClick={handleShow} style={{ margin: "5px" }}>
                 Agregar elemento
             </Button>
             <Modal show={show} onHide={handleClose}>
@@ -87,7 +87,7 @@ function TableData({ data, onDelete }) {
     return (
         <Table striped bordered hover>
             <thead>
-                <tr>
+                <tr style={{ textTransform: 'capitalize' }}>
                     {headers.map((header) => (
                         <th key={header}>{header}</th>
                     ))}
@@ -110,7 +110,8 @@ function TableData({ data, onDelete }) {
 }
 
 function FormProy({ onAdd, onClose }) {
-    const [formData, setFormData] = useState({table: 'libros'});
+    const [formData, setFormData] = useState({ table: 'libros' });
+    const [tipo, setTipo] = useState('libro');
 
     const handleChange = (event) => {
         const { name, value, type, checked } = event.target;
@@ -120,6 +121,10 @@ function FormProy({ onAdd, onClose }) {
         });
         console.log(formData);
     };
+
+    const handleChangeTipo = async (e) => {
+        setTipo(e.target.value);
+    }
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -158,12 +163,20 @@ function FormProy({ onAdd, onClose }) {
                 <Form.Control id="id" name="id" type="text" placeholder="ID" onChange={handleChange} />
             </Form.Group>
             <Form.Group className="mb-3">
+                <Form.Label htmlFor="titulo">Titulo</Form.Label>
+                <Form.Control id="titulo" name="titulo" type="text" placeholder="Titulo" onChange={handleChange} />
+            </Form.Group>
+            <Form.Group className="mb-3">
                 <Form.Label htmlFor="descripcion">Descripcion</Form.Label>
                 <Form.Control id="descripcion" name="descripcion" type="text" placeholder="Descripcion" onChange={handleChange} />
             </Form.Group>
             <Form.Group className="mb-3">
                 <Form.Label htmlFor="idioma">Idioma</Form.Label>
-                <Form.Control id="idioma" name="idioma" type="text" placeholder="Idioma" onChange={handleChange} />
+                <Form.Select id="idioma" name="idioma" onChange={handleChange}>
+                    <option value="eng">Ingles</option>
+                    <option value="esp">Español</option>
+                    <option value="otro">Otro</option>
+                </Form.Select>
             </Form.Group>
             <Form.Group className="mb-3">
                 <Form.Label htmlFor="tipo">Tipo</Form.Label>
@@ -171,12 +184,43 @@ function FormProy({ onAdd, onClose }) {
             </Form.Group>
             <Form.Group className="mb-3">
                 <Form.Label htmlFor="ubicacion">Ubicacion</Form.Label>
-                <Form.Control id="ubicacion" name="ubicacion" type="text" placeholder="Ubicacion"onChange={handleChange}  />
+                <Form.Control id="ubicacion" name="ubicacion" type="text" placeholder="Ubicacion" onChange={handleChange} />
             </Form.Group>
             <Form.Group className="mb-3">
-                <Form.Label htmlFor="instrumento_asociado">Instrumento Asociado</Form.Label>
-                <Form.Control id="instrumento_asociado" name="instrumento_asociado" type="text" placeholder="Instrumento Asociado" onChange={handleChange} />
+                <Form.Label htmlFor="tipo">Tipo</Form.Label>
+                <Form.Select id="tipo" name="tipo" onChange={handleChangeTipo} >
+                    <option value="libro">Libro</option>
+                    <option value="manual">Manual</option>
+                    <option value="otro">Otro</option>
+                </Form.Select>
             </Form.Group>
+
+            {tipo === 'libro' && (
+                <>
+                    <Form.Group className="mb-3">
+                        <Form.Label htmlFor="author">Author</Form.Label>
+                        <Form.Control id="author" name="author" type="text" placeholder="Author" onChange={handleChange} />
+                    </Form.Group>
+                    <Form.Group className="mb-3">
+                        <Form.Label htmlFor="publisher">Publisher</Form.Label>
+                        <Form.Control id="publisher" name="publisher" type="text" placeholder="Publisher" onChange={handleChange} />
+                    </Form.Group>
+                    <Form.Group className="mb-3">
+                        <Form.Label htmlFor="publication_date">Publication Date</Form.Label>
+                        <Form.Control id="publication_date" name="publication_date" type="date" onChange={handleChange} />
+                    </Form.Group>
+                </>
+            )}
+
+            {tipo === 'manual' && (
+                <>
+                    <Form.Group className="mb-3">
+                        <Form.Label htmlFor="intrumento_asociado">Instrumento asociado</Form.Label>
+                        <Form.Control id="intrumento_asociado" name="intrumento_asociado" type="text" placeholder="Instrumento asociado" onChange={handleChange} />
+                    </Form.Group>
+                </>
+            )}
+
             <Button type="submit" >Submit</Button>
         </Form>
     );
