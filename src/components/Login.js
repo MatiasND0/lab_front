@@ -3,18 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import Card from 'react-bootstrap/Card';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
+import { parseJwt } from "./utils/jwtParser";
 
 const IP = 'localhost';
-
-function parseJwt(token) {
-    const base64Url = token.split('.')[1];
-    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-    const jsonPayload = decodeURIComponent(window.atob(base64).split('').map(c => 
-        '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
-    ).join(''));
-
-    return JSON.parse(jsonPayload);
-}
 
 function Login({ setIsAuthenticated, setUserType }) {
     console.log({ setIsAuthenticated, setUserType }); // Verifica que sean funciones

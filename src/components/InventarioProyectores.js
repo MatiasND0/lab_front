@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Button, Table, Modal, Form } from 'react-bootstrap';
+import { parseJwt } from "./utils/jwtParser";
 
 const IP = 'localhost';
 
@@ -243,20 +244,5 @@ function FormProy({ onAdd, onClose }) {
         </Form>
     );
 }
-
-
-function parseJwt(token) {
-    if (!token) {
-        return null;
-    }
-    var base64Url = token.split('.')[1];
-    var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-    var jsonPayload = decodeURIComponent(atob(base64).split('').map(function (c) {
-        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-    }).join(''));
-
-    return JSON.parse(jsonPayload);
-}
-
 
 export default InventarioProyectores;

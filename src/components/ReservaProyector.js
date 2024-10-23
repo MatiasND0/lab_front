@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { addWeeks, format, startOfWeek } from "date-fns";
 import { es } from "date-fns/locale";
 import Button from "./ui/Button";
+import { parseJwt } from "./utils/jwtParser";
 
 const IP = 'localhost';
 
@@ -54,10 +55,10 @@ export default function ReservaProyectores() {
         e.preventDefault();
         if (semana && proyector && hora && materia) { // Verificar que materia no esté vacío
             const fechaSeleccionada = format(semana, "yyyy-MM-dd");
-            const reservaData = { 
-                fecha: fechaSeleccionada, 
-                turno: hora, 
-                cod_rec: proyector, 
+            const reservaData = {
+                fecha: fechaSeleccionada,
+                turno: hora,
+                cod_rec: proyector,
                 username: parsedToken.username,
                 materia, // Incluir el campo materia en los datos de la reserva
                 hdmiRequired // Incluir el estado HDMI en los datos de la reserva
@@ -190,17 +191,4 @@ export default function ReservaProyectores() {
             </form>
         </div>
     );
-}
-
-function parseJwt(token) {
-    if (!token) {
-        return null;
-    }
-    var base64Url = token.split('.')[1];
-    var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-    var jsonPayload = decodeURIComponent(atob(base64).split('').map(function (c) {
-        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-    }).join(''));
-
-    return JSON.parse(jsonPayload);
 }
