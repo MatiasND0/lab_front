@@ -10,6 +10,12 @@ function InventarioProyectores() {
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
 
+    const token = localStorage.getItem('token');
+    const parsedToken = token ? parseJwt(token) : null;
+
+    // Verificamos si el usuario tiene un rol que le permite ver las acciones (por ejemplo, rol 1)
+    const isAdministrator = parsedToken && (parsedToken.role === 1);
+
     const fetchData = async () => {
         try {
             const response = await fetch(`http://${IP}:3000/inventory`, {
@@ -28,10 +34,10 @@ function InventarioProyectores() {
 
     useEffect(() => {
         fetchData();
-    }, []); // El array vacío [] asegura que el efecto se ejecute solo una vez al montar el componente
+    }, []);
 
-    const handleDelete = async (row) => {
-        console.log('Eliminar el elemento con Numero de inventario:', row.nro_inv);
+    const handleDelete = async (nro_inv) => {
+        console.log('Eliminar el elemento con Numero de inventario:', nro_inv);
 
         try {
             const response = await fetch(`http://${IP}:3000/remove-item`, {
@@ -39,7 +45,7 @@ function InventarioProyectores() {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ table: 'proyectores', nro_inv: row.nro_inv }),
+                body: JSON.stringify({ table: 'proyectores', nro_inv: nro_inv }),
             });
 
             if (!response.ok) {
@@ -50,7 +56,7 @@ function InventarioProyectores() {
             console.log('Success:', result);
 
             // Actualizar el estado eliminando el elemento de la tabla
-            setData(data.filter(item => item.nro_inv !== row.nro_inv));
+            setData(data.filter(item => item.nro_inv !== nro_inv));
         } catch (error) {
             console.error('Error:', error);
         }
@@ -62,55 +68,72 @@ function InventarioProyectores() {
 
     return (
         <Container fluid>
-            <Button variant="primary" onClick={handleShow}>
-                Agregar elemento
-            </Button>
+            {isAdministrator && ( // Usar userrole para mostrar la celda de acciones
+                <Button variant="primary" onClick={handleShow}>
+                    Agregar elemento
+                </Button>
+            )}
             <Modal show={show} onHide={handleClose}>
                 <Modal.Header closeButton>
                     <Modal.Title>Agregar</Modal.Title>
                 </Modal.Header>
                 <FormProy onAdd={handleAdd} onClose={handleClose} />
             </Modal>
-            <TableData data={data} onDelete={handleDelete} />
+            <TableData data={data} onDelete={handleDelete} userrole={isAdministrator} />
         </Container>
     );
 };
 
-function TableData({ data, onDelete }) {
-    if (!data) {
-        return <div>Loading...</div>;
-    }
-
-    const excludedColumns = ["column_to_exclude1", "column_to_exclude2"];
-    const headers = data.length > 0 ? Object.keys(data[0]).filter(header => !excludedColumns.includes(header)) : [];
-
+function TableData({ data, onDelete, userrole }) {
     return (
-        <Table striped bordered hover>
+        <table className="table-auto w-full">
             <thead>
                 <tr>
-                    {headers.map((header) => (
-                        <th key={header}>{header}</th>
-                    ))}
+                    <th className="px-4 py-2">ID</th>
+                    <th className="px-4 py-2">Código de reserva</th>
+                    <th className="px-4 py-2">Marca</th>
+                    <th className="px-4 py-2">Modelo</th>
+                    <th className="px-4 py-2">Serial Number</th>
+                    {userrole && ( // Usar userrole para mostrar la celda de acciones
+                        <th className="px-4 py-2">Acciones</th>
+                    )}
                 </tr>
             </thead>
             <tbody>
-                {data.map((row, rowIndex) => (
-                    <tr key={rowIndex}>
-                        {headers.map((header) => (
-                            <td key={header}>{row[header]}</td>
-                        ))}
-                        <td>
-                            <Button onClick={() => onDelete(row)} variant='danger'>Eliminar</Button> {/* Celda con el botón */}
+                {data.length > 0 ? (
+                    data.map((reserva) => (
+                        <tr key={reserva.id}>
+                            <td className="border px-4 py-2">{reserva.nro_inv}</td>
+                            <td className="border px-4 py-2">{reserva.cod_rec}</td>
+                            <td className="border px-4 py-2">{reserva.marca}</td>
+                            <td className="border px-4 py-2">{reserva.modelo}</td>
+                            <td className="border px-4 py-2">{reserva.sn}</td>
+                            {userrole && ( // Solo muestra el botón de eliminar si el usuario tiene permisos
+                                <td className="border px-4 py-2">
+                                    <button
+                                        className="text-red-600 hover:text-red-800"
+                                        onClick={() => onDelete(reserva.nro_inv)}
+                                    >
+                                        Eliminar
+                                    </button>
+                                </td>
+                            )}
+                        </tr>
+                    ))
+                ) : (
+                    <tr>
+                        <td colSpan={userrole ? 6 : 5} className="border px-4 py-2 text-center">
+                            No hay reservas disponibles
                         </td>
                     </tr>
-                ))}
+                )}
             </tbody>
-        </Table>
+        </table>
     );
 }
 
 function FormProy({ onAdd, onClose }) {
-    const [formData, setFormData] = useState({table: 'proyectores',estado: 'Fun_D'});
+    const [formData, setFormData] = useState({ table: 'proyectores', estado: 'Fun_D' });
 
     const handleChange = (event) => {
         const { name, value, type, checked } = event.target;
@@ -220,5 +243,20 @@ function FormProy({ onAdd, onClose }) {
         </Form>
     );
 }
+
+
+function parseJwt(token) {
+    if (!token) {
+        return null;
+    }
+    var base64Url = token.split('.')[1];
+    var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    var jsonPayload = decodeURIComponent(atob(base64).split('').map(function (c) {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+
+    return JSON.parse(jsonPayload);
+}
+
 
 export default InventarioProyectores;
